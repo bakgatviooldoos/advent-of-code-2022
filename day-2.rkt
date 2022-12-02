@@ -75,19 +75,19 @@ your strategy guide?|#
          (list 'paper 'rock)
          (list 'scissors 'paper))
      #f]
+    [(list same same)
+     'draw]
     [(list opponent player)
-     (if (equal? opponent player)
-         'draw
-         (not (player-wins? (list player opponent))))]))
+     (not (player-wins? (list player opponent)))]))
 
 (define rock-paper-scissors-states
   (for*/list ([opponent (list 'rock 'paper 'scissors)]
               [player   (list 'rock 'paper 'scissors)])
     (list opponent player (player-wins? (list opponent player)))))
 
-(define (match-state [opponent 'hole]
-                     [player   'hole]
-                     [outcome  'hole])
+(define (match-state opponent
+                     #:player  [player  'hole]
+                     #:outcome [outcome 'hole])
   (define (matches? state)
     (andmap (lambda (s r)
               (or (equal? 'hole r) (equal? s r)))
@@ -97,8 +97,7 @@ your strategy guide?|#
     (cond [(empty? states)
            (list)]
           [(matches? (car states))
-           (cons (car states)
-                 (loop (cdr states)))]
+           (car states)]
           [else
            (loop (cdr states))])))
 
@@ -123,7 +122,7 @@ your strategy guide?|#
         ["Y" 'paper]
         ["Z" 'scissors]))
     (define outcome
-      (third (car (match-state opponent player 'hole))))
+      (third (match-state opponent #:player player #:outcome 'hole)))
     
     (score player outcome)))
 
@@ -137,7 +136,7 @@ your strategy guide?|#
         ["Y" 'draw]
         ["Z" #t]))
     (define player
-      (second (car (match-state opponent 'hole outcome))))
+      (second (match-state opponent #:player 'hole #:outcome outcome)))
 
     (score player outcome)))
 
