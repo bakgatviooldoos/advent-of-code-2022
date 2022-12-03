@@ -90,12 +90,12 @@ your strategy guide?|#
 (define (->missing-state opponent player outcome)
   (let loop ([states rock-paper-scissors-states])
     (match (car states)
-          [(list (== opponent) player (== outcome))
-           player]
-          [(list (== opponent) (== player) outcome)
-           outcome]
-          [else
-           (loop (cdr states))])))
+      [(list (== opponent) player (== outcome))
+       player]
+      [(list (== opponent) (== player) outcome)
+       outcome]
+      [else
+       (loop (cdr states))])))
 
 (define (score player outcome)
   (define outcome-score
