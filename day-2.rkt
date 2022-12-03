@@ -87,32 +87,27 @@ your strategy guide?|#
               [player   (list 'rock 'paper 'scissors)])
     (list opponent player (player-wins? (list opponent player)))))
 
-(define (match-state opponent
-                     #:player  [player  'hole]
-                     #:outcome [outcome 'hole])
-  (define (matches? state)
-    (andmap (lambda (s r)
-              (or (equal? 'hole r) (equal? s r)))
-            state (list opponent player outcome)))
-  
+(define (->missing-state opponent player outcome)
   (let loop ([states rock-paper-scissors-states])
-    (cond [(empty? states)
-           (list)]
-          [(matches? (car states))
-           (car states)]
+    (match (car states)
+          [(list (== opponent) player (== outcome))
+           player]
+          [(list (== opponent) (== player) outcome)
+           outcome]
           [else
            (loop (cdr states))])))
 
 (define (score player outcome)
-  (define round-score
+  (define outcome-score
     (match outcome
       [#f    0]
       ['draw 3]
       [#t    6]))
+  
   (match player
-    ['rock     (+ 1 round-score)]
-    ['paper    (+ 2 round-score)]
-    ['scissors (+ 3 round-score)]))
+    ['rock     (+ 1 outcome-score)]
+    ['paper    (+ 2 outcome-score)]
+    ['scissors (+ 3 outcome-score)]))
 
 (define (strategy-A guide)
   (for/list ([round guide])
@@ -123,10 +118,7 @@ your strategy guide?|#
         ["X" 'rock]
         ["Y" 'paper]
         ["Z" 'scissors]))
-    (define outcome
-      (third (match-state opponent #:player player #:outcome 'hole)))
-    
-    (score player outcome)))
+    (score player (->missing-state opponent player 'missing))))
 
 (define (strategy-B guide)
   (for/list ([round guide])
@@ -137,10 +129,7 @@ your strategy guide?|#
         ["X" #f]
         ["Y" 'draw]
         ["Z" #t]))
-    (define player
-      (second (match-state opponent #:player 'hole #:outcome outcome)))
-
-    (score player outcome)))
+    (score (->missing-state opponent 'missing outcome) outcome)))
 
 (displayln
  (format "What would your total score be if everything goes exactly according to your strategy guide?~n~a"
