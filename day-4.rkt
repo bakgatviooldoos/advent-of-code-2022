@@ -77,22 +77,22 @@ In how many assignment pairs do the ranges overlap?|#
       (for/list ([line (in-lines)])
         (sort
          (map (lambda (elf-range)
-                (apply cons (map string->number (string-split elf-range "-"))))
+                (map string->number (string-split elf-range "-")))
               (string-split line ","))
          <
-         #:key car)))))
+         #:key first)))))
 
 (define (contains? range-a range-b)
   (match* (range-a range-b)
-    [((cons start-a end-a)
-      (cons start-b end-b))
+    [((list start-a end-a)
+      (list start-b end-b))
      (or (<= start-a start-b end-b end-a)
          (<= start-b start-a end-a end-b))]))
 
 (define (overlaps? range-a range-b)
   (match* (range-a range-b)
-    [((cons start-a end-a)
-      (cons start-b end-b))
+    [((list start-a end-a)
+      (list start-b end-b))
      (or (<= start-a start-b end-a)
          (<= start-b end-a   end-b))]))
 
