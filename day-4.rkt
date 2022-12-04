@@ -75,9 +75,12 @@ In how many assignment pairs do the ranges overlap?|#
   (with-input-from-file "day-4-1.txt"
     (lambda ()
       (for/list ([line (in-lines)])
-        (map (lambda (elf-range)
-               (apply cons (map string->number (string-split elf-range "-"))))
-             (string-split line ","))))))
+        (sort
+         (map (lambda (elf-range)
+                (apply cons (map string->number (string-split elf-range "-"))))
+              (string-split line ","))
+         <
+         #:key car)))))
 
 (define (contains? range-a range-b)
   (match* (range-a range-b)
@@ -91,9 +94,7 @@ In how many assignment pairs do the ranges overlap?|#
     [((cons start-a end-a)
       (cons start-b end-b))
      (or (<= start-a start-b end-a)
-         (<= start-b end-a   end-b)
-         (<= start-b start-a end-b)
-         (<= start-a end-b   end-a))]))
+         (<= start-b end-a   end-b))]))
 
 (displayln
  (format "In how many assignment pairs does one range fully contain the other?~n~a"
