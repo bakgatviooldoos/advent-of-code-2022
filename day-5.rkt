@@ -135,7 +135,8 @@ to unload the final supplies. After the rearrangement procedure completes, what 
                  (read-line)
                  (for/hash ([stack crate-stacks]
                             [index (in-naturals 1)])
-                   (values index (reverse (filter-not (lambda (x) (equal? " " x)) stack))))]
+                   (values index
+                           (reverse (remove* (list " ") stack))))]
                 [else
                  (define top-crates
                    (let get-top-crates ([top-crates line])
