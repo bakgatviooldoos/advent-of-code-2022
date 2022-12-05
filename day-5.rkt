@@ -140,10 +140,10 @@ to unload the final supplies. After the rearrangement procedure completes, what 
                 [else
                  (define top-crates
                    (let get-top-crates ([top-crates line])
-                     (if (< 3 (string-length top-crates))
+                     (if (> 4 (string-length top-crates))
+                         (list (substring top-crates 1 2))
                          (cons (substring top-crates 1 2)
-                               (get-top-crates (substring top-crates 4)))
-                         (list (substring top-crates 1 2)))))
+                               (get-top-crates (substring top-crates 4))))))
                  (loop (map cons top-crates crate-stacks)
                        (read-line*))])))
       (define moves
