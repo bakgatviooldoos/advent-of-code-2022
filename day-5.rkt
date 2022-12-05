@@ -139,13 +139,10 @@ to unload the final supplies. After the rearrangement procedure completes, what 
                            (reverse (remove* (list " ") stack))))]
                 [else
                  (define top-crates
-                   (let get-top-crates ([top-crates line])
-                     (if (> 4 (string-length top-crates))
-                         (list (substring top-crates 1 2))
-                         (cons (substring top-crates 1 2)
-                               (get-top-crates (substring top-crates 4))))))
-                 (loop (map cons top-crates crate-stacks)
-                       (read-line*))])))
+                   (for/list ([crate-index (in-range 1 (string-length line) 4)])
+                     (substring line crate-index (add1 crate-index))))
+                 (loop (map cons top-crates crate-stacks) (read-line*))])))
+      
       (define moves
         (for/list ([line (in-lines)])
           (map string->number
@@ -154,17 +151,17 @@ to unload the final supplies. After the rearrangement procedure completes, what 
       (values crate-stacks moves))))
 
 (define (move stacks count from to model)
-  (define from-crates
+  (define from-stack
     (hash-ref stacks from))
   (hash-set (hash-set stacks
                       from
-                      (drop from-crates count))
+                      (drop from-stack count))
             to
             (append (match model
                       [9000
-                       (reverse (take from-crates count))]
+                       (reverse (take from-stack count))]
                       [9001
-                       (take from-crates count)])
+                       (take from-stack count)])
                     (hash-ref stacks to))))
 
 (define (simulate-crate-arrangement stacks #:mover-model mover-model)
