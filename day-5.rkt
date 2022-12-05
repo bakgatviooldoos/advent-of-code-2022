@@ -153,7 +153,7 @@ to unload the final supplies. After the rearrangement procedure completes, what 
                                   line)))))
       (values crate-stacks moves))))
 
-(define (move stacks count from to #:mover-model model)
+(define (move stacks count from to model)
   (define from-crates
     (hash-ref stacks from))
   (hash-set (hash-set stacks
@@ -170,20 +170,14 @@ to unload the final supplies. After the rearrangement procedure completes, what 
 (define (simulate-crate-arrangement stacks #:mover-model mover-model)
   (let loop ([moves  moves]
              [stacks stacks])
-    (if (empty? moves)
-        stacks
-        (loop (cdr moves)
-              (move stacks
-                    (first (first moves))
-                    (second (first moves))
-                    (third (first moves))
-                    #:mover-model mover-model)))))
+    (match moves
+      [(list)
+       stacks]
+      [(list (list count from to) rest ...)
+       (loop rest (move stacks count from to mover-model))])))
 
 (define (tops-of stacks)
-  (hash-map stacks
-            (lambda (index stack)
-              (first stack))
-            #t))
+  (map first (hash-values stacks)))
 
 (displayln
  (format "After the rearrangement procedure completes [using the CrateMover-9000], what crate ends up on top of each stack?~n~a"
