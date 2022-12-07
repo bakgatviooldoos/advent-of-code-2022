@@ -192,7 +192,7 @@ size of that directory?|#
 (define UPDT-SPACE 30000000)
 (define USED-SPACE (apply max (directory-sizes FILESYSTEM)))
 (define FREE-SPACE (- DISK-SPACE USED-SPACE))
-(define TRGT-SPACE (- UPDT-SPACE USED-SPACE))
+(define TRGT-SPACE (- UPDT-SPACE FREE-SPACE))
 
 (displayln
  (format "Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?~n~a"
