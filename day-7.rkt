@@ -177,14 +177,13 @@ size of that directory?|#
 (define (directory-sizes file-system)
   (define dir-sizes (list))
   (let loop ([top-dir file-system])
-    (for/sum ([dir-or-size (hash-values (directory-children top-dir))])
-      (cond [(number? dir-or-size)
-             dir-or-size]
-            [else
-             (define dir-size
-               (loop dir-or-size))
-             (set! dir-sizes (cons dir-size dir-sizes))
-             dir-size])))
+    (define size
+      (for/sum ([dir-or-size (hash-values (directory-children top-dir))])
+        (if (number? dir-or-size)
+            dir-or-size
+            (loop dir-or-size))))
+    (set! dir-sizes (cons size dir-sizes))
+    size)
   dir-sizes)
 
 (define FILESYSTEM (build-file-system file-system-schema))
