@@ -114,65 +114,43 @@ enough! Between these, choose the smallest: d, increasing unused space by 249336
 Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total
 size of that directory?|#
 
- (define (read-line*)
+(define (read-line*)
   (read-line (current-input-port) 'any))
-
-(define file-system-schema
-  (with-input-from-file "day-7-1.txt"
-    (lambda ()
-      (let loop ([line (read-line*)])
-        (cond [(eof-object? line)
-               (list)]
-              [else
-               (cons
-                (match (string-split line " ")
-                  [(list "$" "cd" "..")
-                   'up]
-                  [(list "$" "cd" dir)
-                   `(cd . ,dir)]
-                  [(list "$" "ls")
-                   'list]
-                  [(list "dir" dir-name)
-                   `(dir . ,dir-name)]
-                  [(list file-size file-name)
-                   `(,(string->number file-size) . ,file-name)])
-                (loop (read-line*)))])))))
 
 (struct directory [parent children]
   #:transparent)
 
-(define (build-file-system schema)
-  (define built
-    (let loop ([curr-dir 'none]
-               [schema   schema])
-      (if (empty? schema)
-          curr-dir
-          (match (car schema)
-            ['up
-             (loop (directory-parent curr-dir)
-                   (cdr schema))]
-            ['list
-             (loop curr-dir (cdr schema))]
-            [`(cd . ,dir)
-             (loop (if (equal? 'none curr-dir)
-                       (directory 'none (make-hash))
-                       (hash-ref (directory-children curr-dir) dir))
-                   (cdr schema))]
-            [`(dir . ,name)
-             (hash-set! (directory-children curr-dir)
-                        name
-                        (directory curr-dir (make-hash)))
-             (loop curr-dir (cdr schema))]
-            [`(,size . ,name)
-             (hash-set! (directory-children curr-dir)
-                        name
-                        size)
-             (loop curr-dir (cdr schema))]))))
-
-  (let loop ([top-dir built])
-    (if (equal? 'none (directory-parent top-dir))
-        top-dir
-        (loop (directory-parent top-dir)))))
+(define file-system
+  (with-input-from-file "day-7-1.txt"
+    (lambda ()
+      (let loop ([curr-dir 'none]
+                 [line     (read-line*)])
+        (if (eof-object? line)
+            (let loop ([top-dir curr-dir])
+              (if (equal? 'none (directory-parent top-dir))
+                  top-dir
+                  (loop (directory-parent top-dir))))
+            (match (string-split line " ")
+              [(list "$" "cd" "..")
+               (loop (directory-parent curr-dir)
+                     (read-line*))]
+              [(list "$" "cd" dir)
+               (loop (if (equal? 'none curr-dir)
+                         (directory 'none (make-hash))
+                         (hash-ref (directory-children curr-dir) dir))
+                     (read-line*))]
+              [(list "$" "ls")
+               (loop curr-dir (read-line*))]
+              [(list "dir" dir-name)
+               (hash-set! (directory-children curr-dir)
+                          dir-name
+                          (directory curr-dir (make-hash)))
+               (loop curr-dir (read-line*))]
+              [(list file-size file-name)
+               (hash-set! (directory-children curr-dir)
+                          file-name
+                          (string->number file-size))
+               (loop curr-dir (read-line*))]))))))
 
 (define (directory-sizes file-system)
   (define dir-sizes (list))
@@ -186,10 +164,9 @@ size of that directory?|#
     size)
   dir-sizes)
 
-(define FILESYSTEM (build-file-system file-system-schema))
 (define DISK-SPACE 70000000)
 (define UPDT-SPACE 30000000)
-(define USED-SPACE (apply max (directory-sizes FILESYSTEM)))
+(define USED-SPACE (apply max (directory-sizes file-system)))
 (define FREE-SPACE (- DISK-SPACE USED-SPACE))
 (define TRGT-SPACE (- UPDT-SPACE FREE-SPACE))
 
@@ -197,7 +174,7 @@ size of that directory?|#
  (format "Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?~n~a"
          (apply + (map (lambda (size)
                          (if (< 100000 size) 0 size))
-                       (directory-sizes FILESYSTEM)))))
+                       (directory-sizes file-system)))))
 (newline)
 
 (displayln
@@ -205,4 +182,4 @@ size of that directory?|#
 size of that directory?~n~a"
          (argmin (lambda (size)
                    (if (< size TRGT-SPACE) +inf.0 size))
-                 (directory-sizes FILESYSTEM))))
+                 (directory-sizes file-system))))
