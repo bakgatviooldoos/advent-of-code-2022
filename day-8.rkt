@@ -85,17 +85,17 @@ This tree's scenic score is 8 (2 * 2 * 1 * 2); this is the ideal spot for the tr
 
 Consider each tree on your map. What is the highest scenic score possible for any tree?|#
 
-(define tree-height-grid
+(define trees
   (with-input-from-file "day-8-1.txt"
     (lambda ()
       (for/vector ([line (in-lines)])
         (list->vector
          (filter-map string->number (string-split line "")))))))
 
-(define ROWS (vector-length tree-height-grid))
-(define COLS (vector-length (vector-ref tree-height-grid 0)))
+(define ROWS (vector-length trees))
+(define COLS (vector-length (vector-ref trees 0)))
 
-(define (visible? trees x y)
+(define (visible? x y)
   (define tree-height
     (vector-ref (vector-ref trees y) x))
   
@@ -108,7 +108,7 @@ Consider each tree on your map. What is the highest scenic score possible for an
       (for/and ([y-south (in-range (+ y 1) ROWS)])
         (< (vector-ref (vector-ref trees y-south) x) tree-height))))
 
-(define (scenic-score trees x y)
+(define (scenic-score x y)
   (define tree-height
     (vector-ref (vector-ref trees y) x))
 
@@ -129,11 +129,11 @@ Consider each tree on your map. What is the highest scenic score possible for an
  (format "Consider your map; how many trees are visible from outside the grid?~n~a"
          (for*/sum ([y   (in-range 0 ROWS)]
                     [x   (in-range 0 COLS)])
-           (if (visible? tree-height-grid x y) 1 0))))
+           (if (visible? x y) 1 0))))
 (newline)
 
 (displayln
  (format "Consider each tree on your map. What is the highest scenic score possible for any tree?~n~a"
          (apply max (for*/list ([y   (in-range 0 ROWS)]
                                 [x   (in-range 0 COLS)])
-                      (scenic-score tree-height-grid x y)))))
+                      (scenic-score x y)))))
