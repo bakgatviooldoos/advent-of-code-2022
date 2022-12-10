@@ -127,13 +127,13 @@ Consider each tree on your map. What is the highest scenic score possible for an
 
 (displayln
  (format "Consider your map; how many trees are visible from outside the grid?~n~a"
-         (for*/sum ([y   (in-range 0 ROWS)]
-                    [x   (in-range 0 COLS)])
+         (for*/sum ([y (in-range 0 ROWS)]
+                    [x (in-range 0 COLS)])
            (if (visible? x y) 1 0))))
 (newline)
 
 (displayln
  (format "Consider each tree on your map. What is the highest scenic score possible for any tree?~n~a"
-         (apply max (for*/list ([y   (in-range 0 ROWS)]
-                                [x   (in-range 0 COLS)])
+         (apply max (for*/list ([y (in-range 0 ROWS)]
+                                [x (in-range 0 COLS)])
                       (scenic-score x y)))))
