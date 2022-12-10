@@ -715,15 +715,13 @@ least once?|#
        
      (define dy (- head.y tail.y))
      (define dx (- head.x tail.x))
-     (cond [(equal? 2 (abs dy))
-            (cons (+ tail.y (truncate (/ dy 2)))
-                  (+ tail.x (sgn dx)))]
-           [(equal? 2 (abs dx))
-            (cons (+ tail.y (sgn dy))
-                  (+ tail.x (truncate (/ dx 2))))]
-           [else
-            (cons (+ tail.y (truncate (/ dy 2)))
-                  (+ tail.x (truncate (/ dx 2))))])]))
+     
+     (cons (+ tail.y (if (equal? 2 (abs dx))
+                         (sgn dy)
+                         (truncate (/ dy 2))))
+           (+ tail.x (if (equal? 2 (abs dy))
+                         (sgn dx)
+                         (truncate (/ dx 2)))))]))
 
 (define (constrain rope)
   (match rope
@@ -737,19 +735,19 @@ least once?|#
   (let loop ([rope  (make-list count (cons 0 0))]
              [went  (list)]
              [moves moves])
-    (cond [(empty? moves)
-           (remove-duplicates (cons (last rope) went))]
-          [else
-           (define head (first rope))
+    (if (empty? moves)
+        (remove-duplicates (cons (last rope) went))
+        (match rope
+          [(list (cons head.y head.x) tail ...)
            (define head*
              (match (car moves)
-               ['L (cons (car head) (- (cdr head) 1))]
-               ['U (cons (+ (car head) 1) (cdr head))]
-               ['R (cons (car head) (+ (cdr head) 1))]
-               ['D (cons (- (car head) 1) (cdr head))]))
+               ['L (cons head.y (- head.x 1))]
+               ['U (cons (+ head.y 1) head.x)]
+               ['R (cons head.y (+ head.x 1))]
+               ['D (cons (- head.y 1) head.x)]))
            (define rope*
-             (constrain (cons head* (cdr rope))))
-           (loop rope* (cons (last rope) went) (cdr moves))])))
+             (constrain (cons head* tail)))
+           (loop rope* (cons (last rope) went) (cdr moves))]))))
 
 (displayln
  (format "Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?~n~a"
