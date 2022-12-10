@@ -745,9 +745,8 @@ least once?|#
                ['U (cons (+ head.y 1) head.x)]
                ['R (cons head.y (+ head.x 1))]
                ['D (cons (- head.y 1) head.x)]))
-           (define rope*
-             (constrain (cons head* tail)))
-           (loop rope* (cons (last rope) went) (cdr moves))]))))
+           (loop (constrain (cons head* tail))
+                 (cons (last rope) went) (cdr moves))]))))
 
 (displayln
  (format "Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?~n~a"
