@@ -154,7 +154,7 @@ signal?|#
 (define lowest-elevations
   (for*/list ([y (in-range 0 ROWS)]
               [x (in-range 0 COLS)]
-              #:do [(define height (height-at y x))]
+              #:do   [(define height (height-at y x))]
               #:when (and (equal? #\a height)
                           (basin-edge? y x)))
     (list y x)))
