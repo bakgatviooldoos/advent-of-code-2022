@@ -368,7 +368,7 @@ manageable. Starting again from the initial state in your puzzle input, what is 
 (define MODULI
   (sort (map (lambda (raw-monkey)
                (match raw-monkey
-                 [(list id operation modulus branch-1 branch-2 items)
+                 [(list id operation modulus rest ...)
                   modulus]))
              RAW-MONKEYS)
         <))
