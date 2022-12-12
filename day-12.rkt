@@ -111,7 +111,7 @@ signal?|#
     (for/vector ([row (in-range 0 ROWS)])
       (make-vector COLS -inf.0)))
   
-  (define (visited? y x)
+  (define (not-visited? y x)
     (negative? (vector-ref (vector-ref visited y) x)))
 
   (define (visit! step y x)
@@ -133,7 +133,7 @@ signal?|#
                                  (apply height-at neighbour))]
                        #:when (and (<= (char->integer next-height)
                                        (+ (char->integer height) 1))
-                                   (apply visited? neighbour)))
+                                   (apply not-visited? neighbour)))
               (apply visit! (cons step neighbour))
               neighbour)
             next-visitors))))
