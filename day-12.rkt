@@ -106,10 +106,11 @@ signal?|#
 (define (height-at y x)
   (vector-ref (vector-ref topograph y) x))
 
-(define (find-path START)
+(define (find-path . start)
   (define visited
-    (for/vector ([row (in-range 0 ROWS)])
-      (make-vector COLS -inf.0)))
+    (for/vector ([y (in-range 0 ROWS)])
+      (for/vector ([x (in-range 0 COLS)])
+        (if (member (list y x) start) 0 -inf.0))))
   
   (define (not-visited? y x)
     (negative? (vector-ref (vector-ref visited y) x)))
@@ -118,14 +119,14 @@ signal?|#
     (vector-set! (vector-ref visited y) x step))
 
   (define path-length
-    (let loop ([visitors (list START)]
-               [step     0])
+    (let loop ([visitors start]
+               [step     1])
       (define next-visitors
         (for/fold ([next-visitors (list)])
                   ([visitor       visitors])
           (define height
             (apply height-at visitor))
-        
+          
           (values
            (append
             (for/list ([neighbour (apply neighbours visitor)]
@@ -139,7 +140,7 @@ signal?|#
             next-visitors))))
 
       (cond [(member END next-visitors)
-             (+ step 1)]
+             step]
             [(empty? next-visitors)
              +inf.0]
             [else
@@ -159,15 +160,15 @@ signal?|#
                           (basin-edge? y x)))
     (list y x)))
 
-(displayln
- (format "What is the fewest steps required to move from your current position to the location that should get the best signal?~n~a"
-         (find-path START)))
+(time
+ (displayln
+  (format "What is the fewest steps required to move from your current position to the location that should get the best signal?~n~a"
+          (find-path START))))
 (newline)
 
-(displayln
- (format "What is the fewest steps required to move starting from any square with elevation a to the location that should get the best
+(time
+ (displayln
+  (format "What is the fewest steps required to move starting from any square with elevation a to the location that should get the best
 signal?~n~a"
-         (inexact->exact
-          (apply min (map (lambda (start)
-                            (find-path start))
-                          lowest-elevations)))))
+          (inexact->exact
+           (apply find-path lowest-elevations)))))
