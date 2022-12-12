@@ -354,7 +354,7 @@ manageable. Starting again from the initial state in your puzzle input, what is 
                 items))]))
 
 (define RAW-MONKEYS
-  (with-input-from-file "day-11-2.txt"
+  (with-input-from-file "day-11-1.txt"
     (lambda ()
       (let loop ([monkeys (list)])
         (define attributes
@@ -373,10 +373,10 @@ manageable. Starting again from the initial state in your puzzle input, what is 
              RAW-MONKEYS)
         <))
 
-(define (item->remainders x)
+(define (number->remainders x)
   (map (lambda (n) (modulo x n)) MODULI))
 
-(define (remainders->item remainders)
+(define (remainders->number remainders)
   (solve-chinese remainders MODULI))
 
 (define (monkeys)
@@ -384,7 +384,7 @@ manageable. Starting again from the initial state in your puzzle input, what is 
     (match raw-monkey
       [(list id operation modulus branch-1 branch-2 items)
        (values id
-               (monkey operation modulus branch-1 branch-2 (map item->remainders items)))])))
+               (monkey operation modulus branch-1 branch-2 (map number->remainders items)))])))
 
 (define (inspect monkeys monkey-id mitigate-worry?)
   (define monkey
@@ -393,11 +393,10 @@ manageable. Starting again from the initial state in your puzzle input, what is 
   (define inspected
     (for/sum ([item (monkey-items monkey)])
       (define item*
-        (let ([item* (remainders->item item)])
-          (item->remainders
-           (if mitigate-worry?
-               (quotient ((monkey-operation monkey) item*) 3)
-               ((monkey-operation monkey) item*)))))
+        (number->remainders
+         (if mitigate-worry?
+             (quotient ((monkey-operation monkey) (remainders->number item)) 3)
+             ((monkey-operation monkey) (remainders->number item)))))
       
       (define throw-to
         (if (zero? (list-ref item* (index-of MODULI (monkey-modulus monkey))))
@@ -420,15 +419,17 @@ manageable. Starting again from the initial state in your puzzle input, what is 
                         (+ inspected (inspect monkeys monkey-id mitigate?))))
               (- rounds 1)))))
 
-(displayln
- (format "What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?~n~a"
-         (apply * (take (sort (hash-values (play (monkeys) #:rounds 20 #:mitigate-worry? #t))
-                              >)
-                        2))))
+(time
+ (displayln
+  (format "What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?~n~a"
+          (apply * (take (sort (hash-values (play (monkeys) #:rounds 20 #:mitigate-worry? #t))
+                               >)
+                         2)))))
 (newline)
 
-(displayln
- (format "Starting again from the initial state in your puzzle input, what is the level of monkey business after 10000 rounds?~n~a"
-         (apply * (take (sort (hash-values (play (monkeys) #:rounds 10000 #:mitigate-worry? #f))
-                              >)
-                        2))))
+(time
+ (displayln
+  (format "Starting again from the initial state in your puzzle input, what is the level of monkey business after 10000 rounds?~n~a"
+          (apply * (take (sort (hash-values (play (monkeys) #:rounds 10000 #:mitigate-worry? #f))
+                               >)
+                         2)))))
