@@ -182,12 +182,12 @@ Organize all of the packets into the correct order. What is the decoder key for 
              rest)]
       [(list "," rest ..1)
        (loop (cons #f stack) rest)]
-      [(list token rest ..1)
+      [(list digit rest ..1)
        (if (number? (car stack))
-           (loop (cons (+ (* 10 (car stack)) (string->number token))
+           (loop (cons (+ (* 10 (car stack)) (string->number digit))
                        (cdr stack))
                  rest)
-           (loop (cons (string->number token) stack)
+           (loop (cons (string->number digit) stack)
                  rest))])))
 
 (define (read-line*)
