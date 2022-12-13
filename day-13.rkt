@@ -173,11 +173,11 @@ Organize all of the packets into the correct order. What is the decoder key for 
       [(list "[" rest ..1)
        (loop (cons "[" stack) (cdr tokens))]
       [(list "]" rest ..0)
-       (define-values (a-list stack-rest)
+       (define-values (lst stack-rest)
          (splitf-at stack (lambda (token)
                             (not (equal? "[" token)))))
 
-       (loop (cons (reverse (filter identity a-list))
+       (loop (cons (reverse (filter identity lst))
                    (cdr stack-rest))
              rest)]
       [(list "," rest ..1)
@@ -212,8 +212,8 @@ Organize all of the packets into the correct order. What is the decoder key for 
 (define (L-before-R? L R)
   (cond [(and (number? L) (number? R))
          (cond [(< L R) #t]
-               [(= L R) '?]
-               [else    #f])]
+               [(> L R) #f]
+               [else    '?])]
         [(and (list? L) (list? R))
          (let loop ([L L]
                     [R R])
